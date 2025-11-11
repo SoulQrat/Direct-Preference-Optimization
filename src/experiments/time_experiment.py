@@ -23,8 +23,8 @@ def time_experiment(model, device, api_key, name):
 
     model = model.to(device)
 
-    dataset = TextDataset(model.tokenizer, split='train[:10%]')
-    dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+    dataset = TextDataset(model.tokenizer, split='train[:1%]')
+    dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
     optimizer = torch.optim.AdamW([params for params in model.parameters() if params.requires_grad], lr=1e-4)
 
 
