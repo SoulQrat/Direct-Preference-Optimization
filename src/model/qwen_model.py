@@ -7,14 +7,16 @@ class Qwen(nn.Module):
     def __init__(self, linear_lora=True):
         super().__init__()
         self.model = AutoModelForCausalLM.from_pretrained('Qwen/Qwen2.5-0.5B')
+        self.tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B")
+        
         self.linear_lora = linear_lora
 
         if self.linear_lora:
             self.lora_(self.model)
 
-    def forward(self, x):
-        return self.model(x)
-    
+    def forward(self, *args, **kwargs):
+        return self.model(*args, **kwargs)
+
     @torch.no_grad()
     def generate(self, *args, **kwargs):
         return self.model.generate(*args, **kwargs)
