@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 def time_experiment(model, device, api_key, name):
     experiment = start(
         api_key = api_key,
-        project_name="SSL_HW1",
+        project_name="NLP_HW4",
         workspace="soulqrat",
         mode="create",
         experiment_config=ExperimentConfig(
@@ -18,6 +18,8 @@ def time_experiment(model, device, api_key, name):
                 log_code=False,
             ),
     )
+
+    experiment.log_parameters(parameters={'model': name, 'lr': 1e-4, **model.params_cnt()})
 
     dataset = TextDataset(model.tokenizer, split='train[:10%]')
     dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
