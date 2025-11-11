@@ -28,4 +28,4 @@ def time_experiment(model, device, api_key, name):
     optimizer = torch.optim.AdamW([params for params in model.parameters() if params.requires_grad], lr=1e-4)
 
 
-    train_epoch(model, dataloader, optimizer, epoch=0, n_epochs=1, device=device, sheduler=None, experiment=experiment)
+    train_epoch(model, dataloader, optimizer, epoch=0, n_epochs=1, device=device, scheduler=None, experiment=experiment)
