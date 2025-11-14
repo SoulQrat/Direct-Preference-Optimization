@@ -10,3 +10,4 @@ class Pythia(LoraModel):
             AutoTokenizer.from_pretrained("EleutherAI/pythia-1.4b"),
             linear_lora,
         )
+        self.tokenizer.pad_token = self.tokenizer.eos_token
