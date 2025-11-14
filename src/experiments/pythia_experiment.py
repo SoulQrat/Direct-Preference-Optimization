@@ -2,7 +2,6 @@ import torch
 from comet_ml import ExperimentConfig, start
 from comet_ml.integration.pytorch import log_model, watch
 from torch.utils.data import DataLoader
-from torch.nn import DataParallel
 
 from src.datasets.rlhf_dataset import RLHFDataset
 from src.train.train import train_epoch_labels
@@ -25,8 +24,6 @@ def pythia_experiment(model, device, api_key, name):
     )
 
     model = model.to(device)
-    model = DataParallel(model)
-
 
     dataset = RLHFDataset(model.tokenizer, split="train")
     dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
@@ -45,5 +42,4 @@ def pythia_experiment(model, device, api_key, name):
         experiment=experiment,
     )
 
-    model = model.module
     log_model(experiment, model, name)
