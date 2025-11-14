@@ -25,7 +25,7 @@ class RLHFDataset(Dataset):
             return_tensors="pt",
         )
 
-        input_ids = ["input_ids"].squeeze(0)
+        input_ids = tokenized["input_ids"].squeeze(0)
         attention_mask = tokenized["attention_mask"].squeeze(0)
         labels = input_ids.clone()
 
