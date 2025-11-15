@@ -2,7 +2,7 @@ from torch.utils.data import Dataset
 from datasets import load_dataset
 
 class RLHFDataset(Dataset):
-    def __init__(self, tokenizer, split="train", max_len=1024):
+    def __init__(self, tokenizer, split="train", max_len=256):
         self.dataset = load_dataset(
             "Anthropic/hh-rlhf", split=split
         )
