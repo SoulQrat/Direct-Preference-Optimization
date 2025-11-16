@@ -1,13 +1,13 @@
 import torch
+from torch.utils.data import DataLoader
 from comet_ml import ExperimentConfig, start
 from comet_ml.integration.pytorch import log_model, watch
-from torch.utils.data import DataLoader
 
 from src.datasets.rlhf_dataset import RLHFDataset
 from src.train.train import train_epoch_labels
 
 
-def pythia_experiment(model, device, api_key, name):
+def pythia_experiment(model, device, api_key, name, batch_size=16):
     experiment = start(
         api_key=api_key,
         project_name="NLP_HW4",
@@ -24,9 +24,9 @@ def pythia_experiment(model, device, api_key, name):
     )
 
     model = model.to(device)
-
     dataset = RLHFDataset(model.tokenizer, split="train")
-    dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
+
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
     optimizer = torch.optim.AdamW(
         [params for params in model.parameters() if params.requires_grad], lr=1e-4
     )

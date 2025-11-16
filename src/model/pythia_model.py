@@ -2,6 +2,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from src.model.lora import LoraModel
 
+import torch.nn as nn
+
 
 class Pythia(LoraModel):
     def __init__(self, linear_lora=True):
@@ -11,3 +13,8 @@ class Pythia(LoraModel):
             linear_lora,
         )
         self.tokenizer.pad_token = self.tokenizer.eos_token
+
+        for module in self.model.modules():
+            if isinstance(module, nn.Embedding):
+                for param in module.parameters():
+                    param.requires_grad = False

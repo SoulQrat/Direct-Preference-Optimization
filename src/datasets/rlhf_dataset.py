@@ -2,7 +2,7 @@ from torch.utils.data import Dataset
 from datasets import load_dataset
 
 class RLHFDataset(Dataset):
-    def __init__(self, tokenizer, split="train", max_len=256):
+    def __init__(self, tokenizer, split="train", max_len=128):
         self.dataset = load_dataset(
             "Anthropic/hh-rlhf", split=split
         )
@@ -29,7 +29,7 @@ class RLHFDataset(Dataset):
         attention_mask = tokenized["attention_mask"].squeeze(0)
         labels = input_ids.clone()
 
-        for i in range(1, prompt_len):
+        for i in range(1, min(prompt_len, self.max_len - 1)):
             labels[i] = -100
 
         return input_ids, attention_mask, labels
