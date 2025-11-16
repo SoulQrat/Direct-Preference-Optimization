@@ -7,7 +7,7 @@ from src.datasets.rlhf_dataset import RLHFDataset
 from src.train.train import train_epoch_labels
 
 
-def pythia_experiment(model, device, api_key, name, batch_size=16):
+def pythia_experiment(model, device, api_key, name, split="train[:15%]"):
     experiment = start(
         api_key=api_key,
         project_name="NLP_HW4",
@@ -24,9 +24,9 @@ def pythia_experiment(model, device, api_key, name, batch_size=16):
     )
 
     model = model.to(device)
-    dataset = RLHFDataset(model.tokenizer, split="train")
+    dataset = RLHFDataset(model.tokenizer, split=split)
 
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
     optimizer = torch.optim.AdamW(
         [params for params in model.parameters() if params.requires_grad], lr=1e-4
     )
