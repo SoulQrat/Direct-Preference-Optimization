@@ -1,21 +1,25 @@
 from torch.utils.data import Dataset
+
 from datasets import load_dataset
+
 
 class RLHFDataset(Dataset):
     def __init__(self, tokenizer, split="train", max_len=128):
-        self.dataset = load_dataset(
-            "Anthropic/hh-rlhf", split=split
-        )
+        self.dataset = load_dataset("Anthropic/hh-rlhf", split=split)
         self.tokenizer = tokenizer
         self.max_len = max_len
-    
+
     def __len__(self):
         return len(self.dataset)
-    
+
     def __getitem__(self, idx):
         text = self.dataset[idx]["chosen"]
-        split_text = text.rsplit('Assistant:', 1)
-        prompt_len = len(self.tokenizer(split_text[0] + ' Assistant:' , add_special_tokens=False)["input_ids"])
+        split_text = text.rsplit("Assistant:", 1)
+        prompt_len = len(
+            self.tokenizer(split_text[0] + " Assistant:", add_special_tokens=False)[
+                "input_ids"
+            ]
+        )
 
         tokenized = self.tokenizer(
             text,

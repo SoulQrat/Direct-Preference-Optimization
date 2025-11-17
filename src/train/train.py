@@ -19,11 +19,12 @@ def train_epoch(
     total_loss = 0
     total_t_forward = 0
     total_t_backward = 0
-    for i, (data, mask) in enumerate(
+    for i, (data, mask, labels) in enumerate(
         tqdm(dataloader, desc=f"Epoch {epoch + 1}/{n_epochs}")
     ):
         data = data.to(device)
         mask = mask.to(device)
+        labels = labels.to(device)
         optimizer.zero_grad()
 
         if collect_stats and torch.cuda.is_available():
@@ -31,7 +32,7 @@ def train_epoch(
             torch.cuda.reset_peak_memory_stats()
 
         t_forward = time.perf_counter()
-        outputs = model(input_ids=data, attention_mask=mask, labels=data)
+        outputs = model(input_ids=data, attention_mask=mask, labels=labels)
         t_forward = time.perf_counter() - t_forward
 
         if collect_stats and torch.cuda.is_available():
@@ -77,42 +78,3 @@ def train_epoch(
                 total_t_backward / len(dataloader),
                 step=epoch + 1,
             )
-
-
-def train_epoch_labels(
-    model,
-    dataloader,
-    optimizer,
-    epoch,
-    n_epochs,
-    device,
-    scheduler=None,
-    experiment=None,
-):
-    model.train()
-    total_loss = 0
-    for i, (data, mask, labels) in enumerate(
-        tqdm(dataloader, desc=f"Epoch {epoch + 1}/{n_epochs}")
-    ):
-        data = data.to(device)
-        mask = mask.to(device)
-        labels = labels.to(device)
-        optimizer.zero_grad()
-
-        outputs = model(input_ids=data, attention_mask=mask, labels=labels)
-
-        loss = outputs.loss
-        loss.backward()
-
-        optimizer.step()
-        if scheduler is not None:
-            scheduler.step(epoch + i / len(dataloader))
-
-        total_loss += loss.item()
-        if experiment is not None:
-            experiment.log_metric("loss", loss.item(), step=epoch * len(dataloader) + i)
-
-    if experiment is not None:
-        experiment.log_metric(
-            "epoch_loss", total_loss / len(dataloader), step=epoch + 1
-        )

@@ -1,8 +1,7 @@
+import torch.nn as nn
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from src.model.lora import LoraModel
-
-import torch.nn as nn
 
 
 class Pythia(LoraModel):

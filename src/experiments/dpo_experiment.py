@@ -3,16 +3,16 @@ from comet_ml import ExperimentConfig, start
 from comet_ml.integration.pytorch import log_model, watch
 from torch.utils.data import DataLoader
 
-from src.datasets.rlhf_dataset import RLHFDataset
-from src.train.train import train_epoch
+from src.datasets.dpo_dataset import DPODataset
+from src.train.dpo_train import train_epoch
 
 
-def pythia_experiment(model, device, api_key, name, split="train[:15%]"):
+def dpo_experiment(model, ref_model, devices, api_key, name, split='train[:15%]'):
     experiment = start(
         api_key=api_key,
-        project_name="NLP_HW4",
-        workspace="soulqrat",
-        mode="create",
+        project_name='NLP_HW4',
+        workspace='soulqrat',
+        mode='create',
         experiment_config=ExperimentConfig(
             name=name,
             log_code=False,
@@ -20,11 +20,12 @@ def pythia_experiment(model, device, api_key, name, split="train[:15%]"):
     )
 
     experiment.log_parameters(
-        parameters={"model": name, "lr": 1e-4, **model.params_cnt()}
+        parameters={'model': name, 'lr': 1e-4, **model.params_cnt()}
     )
 
-    model = model.to(device)
-    dataset = RLHFDataset(model.tokenizer, split=split)
+    model = model.to(devices[0])
+    ref_model = ref_model.to(devices[1])
+    dataset = DPODataset(model.tokenizer, split=split)
 
     dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
     optimizer = torch.optim.AdamW(
@@ -33,14 +34,14 @@ def pythia_experiment(model, device, api_key, name, split="train[:15%]"):
 
     train_epoch(
         model,
+        ref_model,
         dataloader,
         optimizer,
         epoch=0,
         n_epochs=1,
-        device=device,
+        devices=devices,
         scheduler=None,
         experiment=experiment,
-        collect_stats=False,
     )
 
     log_model(experiment, model, name)

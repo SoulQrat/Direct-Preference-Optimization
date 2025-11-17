@@ -23,4 +23,8 @@ class TextDataset(Dataset):
             max_length=self.max_len,
             return_tensors="pt",
         )
-        return tokenized["input_ids"].squeeze(0), tokenized["attention_mask"].squeeze(0)
+        return (
+            tokenized["input_ids"].squeeze(0),
+            tokenized["attention_mask"].squeeze(0),
+            tokenized["input_ids"].squeeze(0),
+        )
